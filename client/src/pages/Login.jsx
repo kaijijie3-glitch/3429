@@ -89,20 +89,6 @@ export default function Login() {
               </Link>
             </p>
           </div>
-
-          <div className="mt-6 pt-6 border-t border-border">
-            <p className="text-text-secondary text-sm text-center mb-3">测试账号</p>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="bg-gray-50 rounded-lg p-3">
-                <p className="font-medium text-text-primary">管理员</p>
-                <p className="text-text-secondary">admin / admin123</p>
-              </div>
-              <div className="bg-gray-50 rounded-lg p-3">
-                <p className="font-medium text-text-primary">客户</p>
-                <p className="text-text-secondary">client1 / client123</p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
