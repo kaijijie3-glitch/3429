@@ -1,0 +1,15 @@
+{
+  "name": "quote-system",
+  "version": "1.0.0",
+  "description": "双用户权限报价系统",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd server && node index.js",
+    "client": "cd client && npm run dev",
+    "build": "cd client && npm run build",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.0"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "build": {
+    "builder": "NIXPACKS",
+    "nixpacks": {
+      "providers": ["node"]
+    },
+    "buildCommand": "cd server && npm install --production && cd ../client && npm install && npm run build"
+  },
+  "startCommand": "cd server && node index.js",
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
