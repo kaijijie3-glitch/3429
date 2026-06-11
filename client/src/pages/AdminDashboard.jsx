@@ -50,41 +50,41 @@ export default function AdminDashboard() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl p-6 border border-border fade-in stagger-1">
+        <Link to="/admin/orders" className="bg-white rounded-xl p-6 border border-border hover:border-primary/50 hover:shadow-md transition-all fade-in stagger-1 group block cursor-pointer">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-text-secondary text-sm">总订单数</p>
+              <p className="text-text-secondary text-sm group-hover:text-primary transition-colors">总订单数</p>
               <p className="text-3xl font-bold text-text-primary mt-1">{stats.total}</p>
             </div>
-            <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors">
               <span className="text-2xl">📋</span>
             </div>
           </div>
-        </div>
+        </Link>
 
-        <div className="bg-white rounded-xl p-6 border border-border fade-in stagger-2">
+        <Link to="/admin/orders?status=pending" className="bg-white rounded-xl p-6 border border-border hover:border-warning/50 hover:shadow-md transition-all fade-in stagger-2 group block cursor-pointer">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-text-secondary text-sm">待报价</p>
+              <p className="text-text-secondary text-sm group-hover:text-warning transition-colors">待报价</p>
               <p className="text-3xl font-bold text-warning mt-1">{stats.pending}</p>
             </div>
-            <div className="w-12 h-12 bg-warning/10 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-warning/10 rounded-xl flex items-center justify-center group-hover:bg-warning/20 transition-colors">
               <span className="text-2xl">⏳</span>
             </div>
           </div>
-        </div>
+        </Link>
 
-        <div className="bg-white rounded-xl p-6 border border-border fade-in stagger-3">
+        <Link to="/admin/orders?status=quoted" className="bg-white rounded-xl p-6 border border-border hover:border-accent/50 hover:shadow-md transition-all fade-in stagger-3 group block cursor-pointer">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-text-secondary text-sm">已报价</p>
+              <p className="text-text-secondary text-sm group-hover:text-accent transition-colors">已报价</p>
               <p className="text-3xl font-bold text-accent mt-1">{stats.quoted}</p>
             </div>
-            <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center group-hover:bg-accent/20 transition-colors">
               <span className="text-2xl">✅</span>
             </div>
           </div>
-        </div>
+        </Link>
 
         <div className="bg-white rounded-xl p-6 border border-border fade-in stagger-4">
           <div className="flex items-center justify-between">
@@ -116,8 +116,9 @@ export default function AdminDashboard() {
         ) : (
           <div className="divide-y divide-border">
             {recentOrders.map(order => (
-              <div
+              <Link
                 key={order.id}
+                to={`/admin/orders/${order.id}`}
                 className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors"
               >
                 <div>
@@ -126,13 +127,17 @@ export default function AdminDashboard() {
                     订单号: {order.orderNo} · 账号: {order.client_name} · 电话: {order.phone || '未填写'} · {new Date(order.created_at).toLocaleDateString('zh-CN')}
                   </p>
                 </div>
-                <Link
-                  to={`/admin/orders/${order.id}/quote`}
-                  className="bg-warning text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-warning/90 transition-colors"
-                >
-                  录入报价
-                </Link>
-              </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-text-secondary text-sm">查看详情 →</span>
+                  <Link
+                    to={`/admin/orders/${order.id}/quote`}
+                    onClick={(e) => e.stopPropagation()}
+                    className="bg-warning text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-warning/90 transition-colors"
+                  >
+                    录入报价
+                  </Link>
+                </div>
+              </Link>
             ))}
           </div>
         )}

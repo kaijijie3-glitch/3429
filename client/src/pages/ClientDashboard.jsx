@@ -66,42 +66,42 @@ export default function ClientDashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl p-6 border border-border fade-in stagger-1">
+ -      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <Link to="/client/orders" className="bg-white rounded-xl p-6 border border-border hover:border-primary/50 hover:shadow-md transition-all fade-in stagger-1 group block cursor-pointer">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-text-secondary text-sm">订单总数</p>
+              <p className="text-text-secondary text-sm group-hover:text-primary transition-colors">订单总数</p>
               <p className="text-3xl font-bold text-text-primary mt-1">{stats.total}</p>
             </div>
-            <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors">
               <span className="text-2xl">📋</span>
             </div>
           </div>
-        </div>
+        </Link>
 
-        <div className="bg-white rounded-xl p-6 border border-border fade-in stagger-2">
+        <Link to="/client/orders?status=pending" className="bg-white rounded-xl p-6 border border-border hover:border-warning/50 hover:shadow-md transition-all fade-in stagger-2 group block cursor-pointer">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-text-secondary text-sm">待报价</p>
+              <p className="text-text-secondary text-sm group-hover:text-warning transition-colors">待报价</p>
               <p className="text-3xl font-bold text-warning mt-1">{stats.pending}</p>
             </div>
-            <div className="w-12 h-12 bg-warning/10 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-warning/10 rounded-xl flex items-center justify-center group-hover:bg-warning/20 transition-colors">
               <span className="text-2xl">⏳</span>
             </div>
           </div>
-        </div>
+        </Link>
 
-        <div className="bg-white rounded-xl p-6 border border-border fade-in stagger-3">
+        <Link to="/client/orders?status=quoted" className="bg-white rounded-xl p-6 border border-border hover:border-accent/50 hover:shadow-md transition-all fade-in stagger-3 group block cursor-pointer">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-text-secondary text-sm">已报价</p>
+              <p className="text-text-secondary text-sm group-hover:text-accent transition-colors">已报价</p>
               <p className="text-3xl font-bold text-accent mt-1">{stats.quoted}</p>
             </div>
-            <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center group-hover:bg-accent/20 transition-colors">
               <span className="text-2xl">✅</span>
             </div>
           </div>
-        </div>
+        </Link>
       </div>
 
       {/* Recent Orders */}

@@ -72,7 +72,7 @@ const initUsers = () => {
   }
   
   // Remove test users if they exist
-  db.users = db.users.filter(u => u.username !== 'admin' && u.username !== 'client1');
+  // db.users = db.users.filter(u => u.username !== 'admin' && u.username !== 'client1');
   
   saveDB(db);
 };

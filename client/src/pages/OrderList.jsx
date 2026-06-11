@@ -11,6 +11,15 @@ export default function OrderList() {
   const location = useLocation();
 
   useEffect(() => {
+    // 获取 URL 参数作为初始筛选条件
+    const searchParams = new URLSearchParams(location.search);
+    const statusParam = searchParams.get('status');
+    if (statusParam && ['pending', 'quoted', 'cancelled'].includes(statusParam)) {
+      setFilterStatus(statusParam);
+    }
+  }, [location.search]);
+
+  useEffect(() => {
     fetchOrders();
   }, [filterStatus, filterOrderNo]);
 
@@ -129,7 +138,7 @@ export default function OrderList() {
                   <p className="text-sm text-text-secondary mt-1">
                     {order.orderNo}
                     {user?.role === 'admin' && order.phone && ` · ${order.phone}`}
-                    {order.client_name && ` · ${order.client_name}`}
+                    {user?.role === 'admin' && order.client_name && ` · ${order.client_name}`}
                     {` · ${new Date(order.created_at).toLocaleDateString('zh-CN')}`}
                   </p>
                 </div>
