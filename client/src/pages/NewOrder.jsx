@@ -138,6 +138,9 @@ function SubOrderForm({ index, subOrder, onUpdate, onRemove }) {
 export default function NewOrder() {
   const [orderName, setOrderName] = useState('');
   const [orderDesc, setOrderDesc] = useState('');
+  const [contactName, setContactName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
   const [subOrders, setSubOrders] = useState([
     { productName: '', productDesc: '', image: '', sizes: {} }
   ]);
@@ -185,6 +188,9 @@ export default function NewOrder() {
         body: JSON.stringify({
           orderName,
           orderDesc,
+          contactName,
+          phone,
+          address,
           subOrders: validSubOrders
         })
       });
@@ -236,6 +242,46 @@ export default function NewOrder() {
                 placeholder="请输入订单名称"
               />
             </div>
+            
+            <div className="md:col-span-1">
+              <label className="block text-sm font-medium text-text-primary mb-2">
+                联系人
+              </label>
+              <input
+                type="text"
+                value={contactName}
+                onChange={(e) => setContactName(e.target.value)}
+                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="请输入联系人姓名"
+              />
+            </div>
+            
+            <div className="md:col-span-1">
+              <label className="block text-sm font-medium text-text-primary mb-2">
+                联系电话
+              </label>
+              <input
+                type="text"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="请输入联系电话"
+              />
+            </div>
+            
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-text-primary mb-2">
+                收货地址
+              </label>
+              <input
+                type="text"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                placeholder="请输入详细收货地址"
+              />
+            </div>
+
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-text-primary mb-2">
                 订单描述

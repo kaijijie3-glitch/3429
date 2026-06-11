@@ -328,14 +328,14 @@ app.get('/api/orders', requireAuth, (req, res) => {
     // Goods staff sees assigned orders, hide client info
     orders = orders.filter(o => o.assigned_goods_staff === req.session.userId);
     orders = orders.map(o => {
-      const { client_id, client_name, ...rest } = o;
+      const { client_id, client_name, contactName, phone, address, ...rest } = o;
       return rest;
     });
   } else if (currentUser.role === 'logistics_handler') {
     // Logistics staff sees assigned orders, hide client info
     orders = orders.filter(o => o.assigned_logistics_staff === req.session.userId);
     orders = orders.map(o => {
-      const { client_id, client_name, ...rest } = o;
+      const { client_id, client_name, contactName, phone, address, ...rest } = o;
       return rest;
     });
   }
@@ -369,7 +369,7 @@ app.get('/api/orders/:id', requireAuth, (req, res) => {
   
   // Hide client info for staff
   if (['goods_handler', 'logistics_handler'].includes(currentUser.role)) {
-    const { client_id, client_name, ...safeOrder } = result;
+    const { client_id, client_name, contactName, phone, address, ...safeOrder } = result;
     result = safeOrder;
   } else {
     result.client_name = db.users.find(u => u.id === order.client_id)?.username || '未知';
@@ -383,7 +383,7 @@ app.post('/api/orders', requireAuth, (req, res) => {
     return res.status(403).json({ error: '只有客户可以创建订单' });
   }
 
-  const { orderName, orderDesc, subOrders } = req.body;
+  const { orderName, orderDesc, subOrders, contactName, phone, address } = req.body;
 
   if (!orderName || !subOrders || subOrders.length === 0) {
     return res.status(400).json({ error: '请填写订单名称和至少一个子订单' });
@@ -396,6 +396,9 @@ app.post('/api/orders', requireAuth, (req, res) => {
     client_id: req.session.userId,
     orderName,
     orderDesc: orderDesc || '',
+    contactName: contactName || '',
+    phone: phone || '',
+    address: address || '',
     status: 'pending',
     assigned_goods_staff: null,
     assigned_logistics_staff: null,

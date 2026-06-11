@@ -236,8 +236,26 @@ export default function OrderDetail() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {order.client_name && (
             <div>
-              <p className="text-sm text-text-secondary">客户</p>
+              <p className="text-sm text-text-secondary">客户账号</p>
               <p className="font-medium text-text-primary mt-1">{order.client_name}</p>
+            </div>
+          )}
+          {order.contactName && (
+            <div>
+              <p className="text-sm text-text-secondary">联系人</p>
+              <p className="font-medium text-text-primary mt-1">{order.contactName}</p>
+            </div>
+          )}
+          {order.phone && (
+            <div>
+              <p className="text-sm text-text-secondary">联系电话</p>
+              <p className="font-medium text-text-primary mt-1">{order.phone}</p>
+            </div>
+          )}
+          {order.address && (
+            <div className="md:col-span-2">
+              <p className="text-sm text-text-secondary">收货地址</p>
+              <p className="font-medium text-text-primary mt-1">{order.address}</p>
             </div>
           )}
           <div>
