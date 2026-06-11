@@ -123,7 +123,7 @@ export default function AdminDashboard() {
                 <div>
                   <p className="font-medium text-text-primary">{order.orderName}</p>
                   <p className="text-sm text-text-secondary mt-1">
-                    订单号: {order.orderNo} · 客户: {order.client_name} · {new Date(order.created_at).toLocaleDateString('zh-CN')}
+                    订单号: {order.orderNo} · 账号: {order.client_name} · 电话: {order.phone || '未填写'} · {new Date(order.created_at).toLocaleDateString('zh-CN')}
                   </p>
                 </div>
                 <Link

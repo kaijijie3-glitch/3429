@@ -128,6 +128,7 @@ export default function OrderList() {
                   </div>
                   <p className="text-sm text-text-secondary mt-1">
                     {order.orderNo}
+                    {user?.role === 'admin' && order.phone && ` · ${order.phone}`}
                     {order.client_name && ` · ${order.client_name}`}
                     {` · ${new Date(order.created_at).toLocaleDateString('zh-CN')}`}
                   </p>
