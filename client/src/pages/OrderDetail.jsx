@@ -476,9 +476,9 @@ export default function OrderDetail() {
 
       {/* Actions */}
       <div className="flex gap-4 mt-6">
-        {user?.role === 'admin' && order.status === 'pending' && (
+        {(user?.role === 'admin' || user?.role === 'goods_handler' || user?.role === 'logistics_handler') && order.status === 'pending' && (
           <Link
-            to={`/admin/orders/${id}/quote`}
+            to={user?.role === 'admin' ? `/admin/orders/${id}/quote` : `/staff/orders/${id}/quote`}
             className="flex-1 bg-warning text-white py-3 rounded-lg font-medium hover:bg-warning/90 transition-colors text-center"
           >
             录入报价

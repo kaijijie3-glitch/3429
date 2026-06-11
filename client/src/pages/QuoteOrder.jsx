@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 
+import { useAuth } from '../contexts/AuthContext';
+
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
 
 export default function QuoteOrder() {
+  const { user } = useAuth();
   const { id } = useParams();
   const [order, setOrder] = useState(null);
   const [subOrderQuotes, setSubOrderQuotes] = useState({});
@@ -79,7 +82,7 @@ export default function QuoteOrder() {
         throw new Error(data.error || '提交报价失败');
       }
 
-      navigate('/admin/orders');
+      navigate(user?.role === 'admin' ? '/admin/orders' : '/staff/orders');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -109,7 +112,7 @@ export default function QuoteOrder() {
     <div className="max-w-4xl mx-auto fade-in">
       <div className="mb-6">
         <Link
-          to="/admin/orders"
+          to={user?.role === 'admin' ? '/admin/orders' : '/staff/orders'}
           className="text-primary text-sm hover:underline mb-2 inline-block"
         >
           ← 返回订单列表

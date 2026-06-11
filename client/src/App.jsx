@@ -7,10 +7,12 @@ import ClientDashboard from './pages/ClientDashboard'
 import AdminDashboard from './pages/AdminDashboard'
 import StaffDashboard from './pages/StaffDashboard'
 import StaffManagement from './pages/StaffManagement'
+import ClientManagement from './pages/ClientManagement'
 import NewOrder from './pages/NewOrder'
 import OrderList from './pages/OrderList'
 import OrderDetail from './pages/OrderDetail'
 import QuoteOrder from './pages/QuoteOrder'
+import LogisticsTracking from './pages/LogisticsTracking'
 import Layout from './components/Layout'
 
 function ProtectedRoute({ children, allowedRoles }) {
@@ -54,6 +56,7 @@ function App() {
             <Route path="new-order" element={<NewOrder />} />
             <Route path="orders" element={<OrderList />} />
             <Route path="orders/:id" element={<OrderDetail />} />
+            <Route path="logistics" element={<LogisticsTracking />} />
           </Route>
           <Route path="/admin" element={
             <ProtectedRoute allowedRoles={['admin']}>
@@ -64,7 +67,9 @@ function App() {
             <Route path="orders" element={<OrderList />} />
             <Route path="orders/:id" element={<OrderDetail />} />
             <Route path="orders/:id/quote" element={<QuoteOrder />} />
+            <Route path="clients" element={<ClientManagement />} />
             <Route path="staff" element={<StaffManagement />} />
+            <Route path="logistics" element={<LogisticsTracking />} />
           </Route>
           <Route path="/staff" element={
             <ProtectedRoute allowedRoles={['goods_handler', 'logistics_handler']}>
@@ -74,6 +79,8 @@ function App() {
             <Route index element={<StaffDashboard />} />
             <Route path="orders" element={<OrderList />} />
             <Route path="orders/:id" element={<OrderDetail />} />
+            <Route path="orders/:id/quote" element={<QuoteOrder />} />
+            <Route path="logistics" element={<LogisticsTracking />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 export default function Register() {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
@@ -27,7 +28,7 @@ export default function Register() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ username, email, password })
       });
 
       const data = await res.json();
@@ -92,6 +93,20 @@ export default function Register() {
                 placeholder="请输入用户名（至少3个字符）"
                 required
                 minLength={3}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-2">
+                邮箱地址
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+                placeholder="请输入邮箱地址（用于接收报价通知）"
+                required
               />
             </div>
 

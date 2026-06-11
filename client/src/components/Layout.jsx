@@ -26,16 +26,20 @@ export default function Layout() {
     if (user?.role === 'admin') {
       return [
         { to: '/admin', label: '订单管理', icon: '📋' },
+        { to: '/admin/clients', label: '客户管理', icon: '🏢' },
         { to: '/admin/staff', label: '员工管理', icon: '👥' },
+        { to: '/admin/logistics', label: '物流查询', icon: '🚚' },
       ]
     } else if (user?.role === 'goods_handler' || user?.role === 'logistics_handler') {
       return [
         { to: '/staff', label: '工作台', icon: '📊' },
+        { to: '/staff/logistics', label: '物流查询', icon: '🚚' },
       ]
     } else {
       return [
         { to: '/client', label: '我的订单', icon: '📋' },
         { to: '/client/new-order', label: '新增订单', icon: '➕' },
+        { to: '/client/logistics', label: '物流查询', icon: '🚚' },
       ]
     }
   }

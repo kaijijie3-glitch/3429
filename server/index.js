@@ -6,10 +6,40 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import multer from 'multer';
+import nodemailer from 'nodemailer';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DB_FILE = path.join(__dirname, '..', 'database.json');
 const UPLOAD_DIR = path.join(__dirname, '..', 'uploads');
+
+// 邮件发送配置
+const transporter = nodemailer.createTransport({
+  host: 'smtp.qq.com',
+  port: 465,
+  secure: true, // true for 465, false for other ports
+  auth: {
+    user: 'g2814028282@qq.com', // 发件邮箱账号
+    pass: 'YOUR_EMAIL_AUTH_CODE', // 请替换为真实的 QQ 邮箱 SMTP 授权码
+  },
+});
+
+// 发送邮件的辅助函数
+const sendEmail = async (to, subject, text) => {
+  try {
+    const info = await transporter.sendMail({
+      from: '"报价系统" <g2814028282@qq.com>', // 发件人
+      to: to, // 收件人
+      subject: subject, // 邮件标题
+      text: text, // 邮件纯文本内容
+      // html: "<b>或者使用 HTML 格式的邮件内容</b>",
+    });
+    console.log('邮件发送成功: %s', info.messageId);
+    return true;
+  } catch (error) {
+    console.error('邮件发送失败:', error);
+    return false;
+  }
+};
 
 // Create upload directory if not exists
 if (!fs.existsSync(UPLOAD_DIR)) {
@@ -96,22 +126,22 @@ app.use(session({
 }));
 
 // Generate order number
-const generateOrderNo = () => {
+const generateOrderNo = (orderId) => {
   const date = new Date();
   const dateStr = date.getFullYear().toString() + 
                   (date.getMonth() + 1).toString().padStart(2, '0') + 
                   date.getDate().toString().padStart(2, '0');
-  const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-  return `ORD${dateStr}${random}`;
+  const sequential = orderId.toString().padStart(4, '0');
+  return `ORD${dateStr}${sequential}`;
 };
 
-const generateSubOrderNo = () => {
+const generateSubOrderNo = (subOrderId) => {
   const date = new Date();
   const dateStr = date.getFullYear().toString() + 
                   (date.getMonth() + 1).toString().padStart(2, '0') + 
                   date.getDate().toString().padStart(2, '0');
-  const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-  return `SUB${dateStr}${random}`;
+  const sequential = subOrderId.toString().padStart(4, '0');
+  return `SUB${dateStr}${sequential}`;
 };
 
 // Auth middleware
@@ -181,10 +211,10 @@ app.get('/api/auth/me', (req, res) => {
 });
 
 app.post('/api/auth/register', (req, res) => {
-  const { username, password } = req.body;
+  const { username, email, password } = req.body;
 
-  if (!username || !password) {
-    return res.status(400).json({ error: '请填写用户名和密码' });
+  if (!username || !password || !email) {
+    return res.status(400).json({ error: '请填写用户名、邮箱和密码' });
   }
 
   if (username.length < 3) {
@@ -203,6 +233,7 @@ app.post('/api/auth/register', (req, res) => {
   const newUser = {
     id: db.nextUserId++,
     username,
+    email,
     password: hashedPassword,
     role: 'client',
     created_at: new Date().toISOString()
@@ -210,6 +241,13 @@ app.post('/api/auth/register', (req, res) => {
 
   db.users.push(newUser);
   saveDB(db);
+
+  // --- 发送注册成功欢迎邮件 ---
+  sendEmail(
+    email,
+    `【注册成功】欢迎加入报价系统`,
+    `亲爱的 ${username}：\n\n您已成功注册报价系统客户账号！\n您的登录账号为：${username}\n\n您现在可以登录系统并随时提交您的报价订单了。`
+  );
 
   res.json({
     id: newUser.id,
@@ -237,6 +275,7 @@ app.get('/api/staff', requireAdmin, (req, res) => {
     .map(u => ({ 
       id: u.id, 
       username: u.username, 
+      email: u.email,
       role: u.role, 
       created_at: u.created_at 
     }));
@@ -244,9 +283,9 @@ app.get('/api/staff', requireAdmin, (req, res) => {
 });
 
 app.post('/api/staff', requireAdmin, (req, res) => {
-  const { username, password, role } = req.body;
+  const { username, email, password, role } = req.body;
 
-  if (!username || !password || !role) {
+  if (!username || !email || !password || !role) {
     return res.status(400).json({ error: '请填写完整信息' });
   }
 
@@ -270,6 +309,7 @@ app.post('/api/staff', requireAdmin, (req, res) => {
   const newUser = {
     id: db.nextUserId++,
     username,
+    email,
     password: hashedPassword,
     role,
     created_at: new Date().toISOString()
@@ -389,7 +429,7 @@ app.post('/api/orders', requireAuth, (req, res) => {
     return res.status(400).json({ error: '请填写订单名称和至少一个子订单' });
   }
 
-  const orderNo = generateOrderNo();
+  const orderNo = generateOrderNo(db.nextOrderId);
   const newOrder = {
     id: db.nextOrderId++,
     orderNo,
@@ -412,7 +452,7 @@ app.post('/api/orders', requireAuth, (req, res) => {
   db.orders.push(newOrder);
 
   const createdSubOrders = subOrders.map(sub => {
-    const subOrderNo = generateSubOrderNo();
+    const subOrderNo = generateSubOrderNo(db.nextSubOrderId);
     const subOrder = {
       id: db.nextSubOrderId++,
       subOrderNo,
@@ -430,13 +470,40 @@ app.post('/api/orders', requireAuth, (req, res) => {
   });
 
   saveDB(db);
+  
+  // --- 发送新订单提醒给所有管理员 ---
+  const admins = db.users.filter(u => u.role === 'admin' && u.email);
+  admins.forEach(admin => {
+    sendEmail(
+      admin.email, 
+      `【新订单通知】收到新订单：${orderName}`, 
+      `您有新的待报价订单：
+订单号：${orderNo}
+货品名称：${orderName}
+客户联系人：${contactName}
+电话：${phone}
+
+请尽快登录系统进行报价处理。`
+    );
+  });
+
   res.json({ ...newOrder, subOrders: createdSubOrders });
 });
 
-app.put('/api/orders/:id/quote', requireAdmin, (req, res) => {
+app.put('/api/orders/:id/quote', requireStaffOrAdmin, (req, res) => {
   const order = db.orders.find(o => o.id === parseInt(req.params.id));
   if (!order) {
     return res.status(404).json({ error: '订单不存在' });
+  }
+  
+  const currentUser = db.users.find(u => u.id === req.session.userId);
+  
+  // 权限检查：如果员工被分配了，或者是admin
+  if (currentUser.role === 'goods_handler' && order.assigned_goods_staff !== req.session.userId) {
+    return res.status(403).json({ error: '权限不足' });
+  }
+  if (currentUser.role === 'logistics_handler' && order.assigned_logistics_staff !== req.session.userId) {
+    return res.status(403).json({ error: '权限不足' });
   }
   if (order.status !== 'pending') {
     return res.status(400).json({ error: '只能对待报价订单进行报价' });
@@ -459,9 +526,30 @@ app.put('/api/orders/:id/quote', requireAdmin, (req, res) => {
   order.quoted_at = new Date().toISOString();
   saveDB(db);
 
-  const client_name = db.users.find(u => u.id === order.client_id)?.username || '未知';
+  const client = db.users.find(u => u.id === order.client_id);
+  const client_name = client?.username || '未知';
   const subOrders = db.subOrders.filter(s => s.orderId === order.id);
-  res.json({ ...order, client_name, subOrders });
+  
+  // --- 发送报价完成邮件提醒 ---
+  if (client && client.email) {
+    sendEmail(
+      client.email, 
+      `【报价完成通知】订单 ${order.orderNo} 已报价`, 
+      `亲爱的 ${client_name}：\n\n您的订单 ${order.orderNo} 已经完成报价，请登录系统查看详情。`
+    );
+  }
+
+  let result = { ...order, subOrders };
+  
+  // 隐藏客户信息
+  if (['goods_handler', 'logistics_handler'].includes(currentUser.role)) {
+    const { client_id, client_name: cn, contactName, phone, address, ...safeOrder } = result;
+    result = safeOrder;
+  } else {
+    result.client_name = client_name;
+  }
+
+  res.json(result);
 });
 
 app.put('/api/orders/:id/assign', requireAdmin, (req, res) => {
@@ -479,6 +567,15 @@ app.put('/api/orders/:id/assign', requireAdmin, (req, res) => {
       const staff = db.users.find(u => u.id === goods_staff_id && u.role === 'goods_handler');
       if (staff) {
         order.assigned_goods_staff = goods_staff_id;
+        
+        // --- 发送分配提醒给货物处理员 ---
+        if (staff.email) {
+          sendEmail(
+            staff.email,
+            `【新任务通知】您被分配了新订单 ${order.orderNo}`,
+            `您好，${staff.username}：\n\n您被分配了处理订单 ${order.orderNo} 的货物任务，请登录系统查看详情。`
+          );
+        }
       }
     }
   }
@@ -490,6 +587,15 @@ app.put('/api/orders/:id/assign', requireAdmin, (req, res) => {
       const staff = db.users.find(u => u.id === logistics_staff_id && u.role === 'logistics_handler');
       if (staff) {
         order.assigned_logistics_staff = logistics_staff_id;
+        
+        // --- 发送分配提醒给物流处理员 ---
+        if (staff.email) {
+          sendEmail(
+            staff.email,
+            `【新任务通知】您被分配了新订单 ${order.orderNo}`,
+            `您好，${staff.username}：\n\n您被分配了处理订单 ${order.orderNo} 的物流任务，请登录系统查看详情。`
+          );
+        }
       }
     }
   }
@@ -592,7 +698,17 @@ app.put('/api/orders/:id/cancel', requireAuth, (req, res) => {
 app.get('/api/clients', requireAdmin, (req, res) => {
   const clients = db.users
     .filter(u => u.role === 'client')
-    .map(u => ({ id: u.id, username: u.username, created_at: u.created_at }));
+    .map(u => {
+      // 计算客户的订单数量
+      const orderCount = db.orders.filter(o => o.client_id === u.id).length;
+      return { 
+        id: u.id, 
+        username: u.username, 
+        email: u.email,
+        created_at: u.created_at,
+        orderCount
+      };
+    });
   res.json(clients);
 });
 

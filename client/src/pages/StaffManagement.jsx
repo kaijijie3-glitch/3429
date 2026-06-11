@@ -6,6 +6,7 @@ export default function StaffManagement() {
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
+    email: '',
     password: '',
     role: 'goods_handler'
   });
@@ -46,7 +47,7 @@ export default function StaffManagement() {
         throw new Error(data.error || '创建失败');
       }
 
-      setFormData({ username: '', password: '', role: 'goods_handler' });
+      setFormData({ username: '', email: '', password: '', role: 'goods_handler' });
       setShowModal(false);
       fetchStaff();
     } catch (err) {
@@ -104,20 +105,22 @@ export default function StaffManagement() {
         ) : (
           <div className="divide-y divide-border">
             <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50 text-sm font-medium text-text-secondary">
-              <div className="col-span-3">用户名</div>
-              <div className="col-span-3">角色</div>
-              <div className="col-span-4">创建时间</div>
+              <div className="col-span-2">用户名</div>
+              <div className="col-span-3">邮箱</div>
+              <div className="col-span-2">角色</div>
+              <div className="col-span-3">创建时间</div>
               <div className="col-span-2 text-right">操作</div>
             </div>
             {staff.map((s) => (
               <div key={s.id} className="grid grid-cols-12 gap-4 px-6 py-4 items-center">
-                <div className="col-span-3 font-medium text-text-primary">{s.username}</div>
-                <div className="col-span-3">
-                  <span className="px-2 py-1 bg-primary/10 text-primary rounded text-sm">
+                <div className="col-span-2 font-medium text-text-primary truncate">{s.username}</div>
+                <div className="col-span-3 text-text-secondary text-sm truncate" title={s.email}>{s.email || '-'}</div>
+                <div className="col-span-2">
+                  <span className="px-2 py-1 bg-primary/10 text-primary rounded text-sm whitespace-nowrap">
                     {getRoleLabel(s.role)}
                   </span>
                 </div>
-                <div className="col-span-4 text-text-secondary text-sm">
+                <div className="col-span-3 text-text-secondary text-sm">
                   {new Date(s.created_at).toLocaleDateString('zh-CN')}
                 </div>
                 <div className="col-span-2 text-right">
@@ -156,6 +159,19 @@ export default function StaffManagement() {
                   placeholder="请输入用户名"
                   required
                   minLength={3}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text-primary mb-2">
+                  邮箱地址
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-primary"
+                  placeholder="请输入邮箱地址（用于接收通知）"
+                  required
                 />
               </div>
               <div>
