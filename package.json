@@ -4,6 +4,7 @@
   "description": "双用户权限报价系统",
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "start": "cd server && node index.js",
     "server": "cd server && node index.js",
     "client": "cd client && npm run dev",
     "build": "cd client && npm run build",
